@@ -184,21 +184,21 @@ Na versão atual do protótipo, o formulário no Google Forms **não possui camp
 #### 1. Google Sheets — Watch New Rows (Módulo 1)
 > Monitora a planilha vinculada ao Google Forms e dispara o fluxo ao detectar uma nova linha, capturando nome, e-mail, descrição, valor e número da linha.
 
-![Módulo 1](link-da-imagem-do-modulo-1.png)
+![Módulo 1](<img width="352" height="397" alt="image" src="https://github.com/user-attachments/assets/59198c5c-14fb-413e-afe1-ccdd379ddb07" />)
 
 ---
 
 #### 2. Google Gemini AI — Generate a Response (Módulo 2)
 > Analisa a semântica da justificativa e o valor frente ao teto de R$ 500,00 para avaliar a conformidade, classificar o risco e definir a decisão.
 
-![Módulo 2](link-da-imagem-do-modulo-2.png)
+![Módulo 2](<img width="356" height="404" alt="image" src="https://github.com/user-attachments/assets/7812ca7e-79ce-47a6-8cfe-f1f677c08a27" />)
 
 ---
 
 #### 3. JSON — Parse JSON (Módulo 3)
 > Converte o retorno textual do modelo de IA em um objeto estruturado contendo as variáveis `decisao`, `risco` e `justificativa`.
 
-![Módulo 3](link-da-imagem-do-modulo-3.png)
+![Módulo 3](<img width="352" height="223" alt="image" src="https://github.com/user-attachments/assets/c0dc0d16-bf2b-4f47-a52d-0124c4a64ea3" />)
 
 ---
 
