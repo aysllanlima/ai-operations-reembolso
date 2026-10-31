@@ -179,16 +179,70 @@ Na versão atual do protótipo, o formulário no Google Forms **não possui camp
 
 ---
 
-## 📸 8. Evidências de Execução (Prints)
+## 📸 8. Evidências e Detalhamento dos 9 Módulos do Workflow
 
-### 8.1. Cenário Completo Orquestrado no Make (9 Módulos + Error Handler)
-![Cenário Make]
-<img width="959" height="410" alt="image" src="https://github.com/user-attachments/assets/98030701-49a4-4c93-ad2a-2a8ecbe962d8" />
-![Google Sheets [1] (Watch New Rows): Monitora a planilha vinculada ao Google Forms e dispara o fluxo ao detectar uma nova linha, capturando nome, e-mail, descrição, valor e número da linha]
-<img width="352" height="398" alt="image" src="https://github.com/user-attachments/assets/b055ad44-96a4-4183-bdab-d61f519f3719" />
-![Google Gemini AI [2] (Generate a response): Analisa a semântica da justificativa e o valor frente ao teto de R$ 500,00 para avaliar a conformidade, classificar o risco e definir a decisão]
-<img width="355" height="401" alt="image" src="https://github.com/user-attachments/assets/e824dcb1-eecd-4318-863a-8c4181e231fc" />
+#### 1. Google Sheets — Watch New Rows (Módulo 1)
+> Monitora a planilha vinculada ao Google Forms e dispara o fluxo ao detectar uma nova linha, capturando nome, e-mail, descrição, valor e número da linha.
 
+![Módulo 1](link-da-imagem-do-modulo-1.png)
+
+---
+
+#### 2. Google Gemini AI — Generate a Response (Módulo 2)
+> Analisa a semântica da justificativa e o valor frente ao teto de R$ 500,00 para avaliar a conformidade, classificar o risco e definir a decisão.
+
+![Módulo 2](link-da-imagem-do-modulo-2.png)
+
+---
+
+#### 3. JSON — Parse JSON (Módulo 3)
+> Converte o retorno textual do modelo de IA em um objeto estruturado contendo as variáveis `decisao`, `risco` e `justificativa`.
+
+![Módulo 3](link-da-imagem-do-modulo-3.png)
+
+---
+
+#### 4. Flow Control — Router (Módulo 4)
+> Avalia a variável `decisao` extraída do JSON e ramifica o fluxo em três caminhos condicionais mutuamente exclusivos.
+
+![Módulo 4](link-da-imagem-do-modulo-4.png)
+
+---
+
+#### 5. Google Sheets — Update a Row / Rota 1 Aprovado (Módulo 5)
+> Grava o parecer da IA na planilha e atualiza a coluna `Status_Final` para `Aprovado Automaticamente` em despesas legítimas abaixo de R$ 500,00.
+
+![Módulo 5](link-da-imagem-do-modulo-5.png)
+
+---
+
+#### 6. Google Sheets — Update a Row / Rota 2 Revisão Humana (Módulo 6)
+> Atualiza o registro na planilha com o status `Aguardando Aprovação Humana (HITL)` para pedidos de valor elevado ou exceções operacionais.
+
+![Módulo 6](link-da-imagem-do-modulo-6.png)
+
+---
+
+#### 7. Gmail — Send an Email / Rota 2 Revisão Humana (Módulo 7)
+> Dispara um e-mail executivo em HTML ao gestor responsável contendo os dados do pedido, a análise da IA e o botão de acesso à planilha.
+
+![Módulo 7](link-da-imagem-do-modulo-7.png)
+
+---
+
+#### 8. Google Sheets — Update a Row / Error Handler (Módulo 8)
+> Rota de contingência acoplada ao módulo do Gemini que captura falhas ou limites de cota da API e registra `Erro na IA - Revisar Manualmente`.
+
+![Módulo 8](link-da-imagem-do-modulo-8.png)
+
+---
+
+#### 9. Google Sheets — Update a Row / Rota 3 Reprovado (Módulo 9)
+> Registra a justificativa de auditoria na planilha e define o status como `Reprovado Automaticamente` para gastos pessoais, implausíveis ou vagos.
+
+![Módulo 9](link-da-imagem-do-modulo-9.png)
+
+---
 
 
 ### 8.2. Repositório Tabular no Google Sheets com Testes Executados e Menus Suspensos
