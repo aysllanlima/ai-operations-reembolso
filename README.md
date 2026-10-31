@@ -181,10 +181,15 @@ Na versão atual do protótipo, o formulário no Google Forms **não possui camp
 
 ## 📸 8. Evidências de Execução (Prints)
 
-> *(Substitua os caminhos abaixo pelas imagens salvas na pasta do seu repositório GitHub)*
-
 ### 8.1. Cenário Completo Orquestrado no Make (9 Módulos + Error Handler)
-![Cenário Make](./prints/01-fluxo-make.png)
+![Cenário Make]
+<img width="959" height="410" alt="image" src="https://github.com/user-attachments/assets/98030701-49a4-4c93-ad2a-2a8ecbe962d8" />
+![Google Sheets [1] (Watch New Rows): Monitora a planilha vinculada ao Google Forms e dispara o fluxo ao detectar uma nova linha, capturando nome, e-mail, descrição, valor e número da linha]
+<img width="352" height="398" alt="image" src="https://github.com/user-attachments/assets/b055ad44-96a4-4183-bdab-d61f519f3719" />
+![Google Gemini AI [2] (Generate a response): Analisa a semântica da justificativa e o valor frente ao teto de R$ 500,00 para avaliar a conformidade, classificar o risco e definir a decisão]
+<img width="355" height="401" alt="image" src="https://github.com/user-attachments/assets/e824dcb1-eecd-4318-863a-8c4181e231fc" />
+
+
 
 ### 8.2. Repositório Tabular no Google Sheets com Testes Executados e Menus Suspensos
 ![Planilha Google Sheets](./prints/02-planilha-resultados.png)
