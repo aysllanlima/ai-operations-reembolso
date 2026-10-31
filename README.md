@@ -38,8 +38,8 @@ O processo escolhido para remodelagem é o fluxo de **Triagem, Auditoria de Comp
 | :--- | :--- | :--- |
 | **Entrada de Dados** | Pedidos despadronizados por e-mail ou mensagens. | Captura padronizada via **Google Forms** com campos obrigatórios. |
 | **Triagem e Compliance** | Leitura manual de cada justificativa e conferência de valores. | Auditoria semântica e classificação de risco instantânea via **Google Gemini Flash**. |
-| **Despesas Baixas / Descabidas** | Gestores perdem tempo aprovando valores irrisórios ou recusando gastos pessoais óbvios. | **Autonomia da IA** para aprovar despesas legítimas ($< \text{R\$ } 500,00$) e reprovar pedidos vagos ou pessoais. |
-| **Ações Críticas (Alçada Alta)** | Risco de aprovação sem critério ou atraso por falta de visibilidade. | **Human-in-the-Loop (HITL):** pausa automática e alerta em HTML ao gestor para valores $\ge \text{R\$ } 500,00$ ou exceções. |
+| **Despesas Baixas / Descabidas** | Gestores perdem tempo aprovando valores irrisórios ou recusando gastos pessoais óbvios. | **Autonomia da IA** para aprovar despesas legítimas (abaixo de R$ 500,00) e reprovar pedidos vagos ou pessoais. |
+| **Ações Críticas (Alçada Alta)** | Risco de aprovação sem critério ou atraso por falta de visibilidade. | **Human-in-the-Loop (HITL):** pausa automática e alerta em HTML ao gestor para valores iguais ou superiores a R$ 500,00 ou exceções. |
 | **Rastreabilidade e Falhas** | Planilhas desatualizadas e perda de histórico em caso de erro. | Persistência tabular estruturada no **Google Sheets** e rota dedicada de **Error Handling**. |
 
 ---
@@ -66,7 +66,7 @@ flowchart LR
 
 ### Detalhamento dos 9 Módulos no Make
 1. **Módulo 1 — Entrada e Gatilho (`Google Sheets - Watch New Rows`):** O colaborador envia o formulário no Google Forms, gerando imediatamente uma nova linha na planilha vinculada. O Make monitora novas linhas e captura Nome, E-mail, Descrição, Valor e o Número da Linha (`Row number`).
-2. **Módulo 2 — Processamento Cognitivo (`Google Gemini AI - Generate a response`):** Envia a descrição da despesa e o valor informado ao modelo Gemini Flash sob um prompt de auditoria de compliance, que interpreta a justificativa, avalia o mérito do gasto e considera a regra de alçada de $\text{R\$ } 500,00$.
+2. **Módulo 2 — Processamento Cognitivo (`Google Gemini AI - Generate a response`):** Envia a descrição da despesa e o valor informado ao modelo Gemini Flash sob um prompt de auditoria de compliance, que interpreta a justificativa, avalia o mérito do gasto e considera a regra de alçada de R$ 500,00.
 3. **Módulo 3 — Estruturação de Dados (`JSON - Parse JSON`):** Converte a string retornada pela IA em um objeto JSON estruturado com três variáveis estritas: `decisao`, `risco` e `justificativa`.
 4. **Módulo 4 — Roteamento Condicional (`Flow Control - Router`):** Avalia a variável `decisao` e ramifica o workflow em três caminhos mutuamente exclusivos:
    - **Rota 1 — Aprovação Automática (`Filtro: decisao = APROVADO`):** Aciona o **Módulo 5 (`Google Sheets - Update a Row`)**, gravando a análise da IA e definindo o `Status_Final` como `Aprovado Automaticamente`.
@@ -102,7 +102,7 @@ flowchart LR
 ## 🧠 5. Função da Inteligência Artificial e Engenharia de Prompt
 
 A Inteligência Artificial atua como o núcleo decisório de triagem do workflow, executando quatro funções concretas:
-1. **Interpretação do Valor e Regra de Alçada:** Considera o valor informado (normalizando ponto e vírgula decimal) frente ao teto de $\text{R\$ } 500,00$. *(Nota de arquitetura: por se tratar de uma regra financeira objetiva, em uma versão de produção recomenda-se que a comparação numérica seja conferida também por filtro determinístico no Make antes da atualização definitiva do status, evitando depender exclusivamente da inferência probabilística do modelo).*
+1. **Interpretação do Valor e Regra de Alçada:** Considera o valor informado (normalizando ponto e vírgula decimal) frente ao teto de R$ 500,00. *(Nota de arquitetura: por se tratar de uma regra financeira objetiva, em uma versão de produção recomenda-se que a comparação numérica seja conferida também por filtro determinístico no Make antes da atualização definitiva do status, evitando depender exclusivamente da inferência probabilística do modelo).*
 2. **Análise Semântica de Compliance:** Avalia se a justificativa corresponde a uma despesa corporativa verossímil ou se configura gasto pessoal, lazer, declaração explícita de ausência de comprovante fiscal ou descrição vaga/monossilábica.
 3. **Classificação de Risco Operacional:** Atribui dinamicamente o nível de risco em `BAIXO`, `MEDIO` ou `ALTO`.
 4. **Determinação de Rota do Workflow:** Emite o JSON estruturado que governa o módulo `Router` do Make.
@@ -158,11 +158,11 @@ Responda APENAS com um objeto JSON válido, em linha única, sem blocos de códi
 
 ### Matriz de Delegação Operacional
 - **Decisões 100% Automatizadas (Delegadas à IA):**
-  1. **Aprovação Direta (`APROVADO`):** Solicitações com valor estritamente inferior a $\text{R\$ } 500,00$, nexo corporativo claro e risco baixo.
+  1. **Aprovação Direta (`APROVADO`):** Solicitações com valor estritamente inferior a R$ 500,00, nexo corporativo claro e risco baixo.
   2. **Reprovação Direta (`REPROVADO`):** Solicitações de qualquer valor com motivos implausíveis, despesas pessoais/familiares, declaração explícita na descrição de que não há comprovante fiscal ou textos vagos/monossilábicos (ex.: `"compras"`).
 - **Ponto de Supervisão Humana — Human-in-the-Loop (`REVISAO_HUMANA`):**
-  1. **Alçada Financeira Elevada (`Risco: ALTO`):** Despesas corporativas legítimas cujo valor seja igual ou superior a $\text{R\$ } 500,00$.
-  2. **Exceções Operacionais Plausíveis (`Risco: MEDIO`):** Despesas abaixo de $\text{R\$ } 500,00$ com justificativa detalhada, mas em categorias atípicas (ex.: brindes ou refeições para clientes).  
+  1. **Alçada Financeira Elevada (`Risco: ALTO`):** Despesas corporativas legítimas cujo valor seja igual ou superior a R$ 500,00.
+  2. **Exceções Operacionais Plausíveis (`Risco: MEDIO`):** Despesas abaixo de R$ 500,00 com justificativa detalhada, mas em categorias atípicas (ex.: brindes ou refeições para clientes).  
   *Ação HITL:* O sistema registra `Aguardando Aprovação Humana (HITL)` e envia um e-mail executivo ao gestor, cabendo exclusivamente ao humano alterar o seletor na planilha para `Aprovado pelo Gestor` ou `Reprovado pelo Gestor`.
 
 ### ⚠️ Delimitação Documental da Versão Atual
@@ -203,10 +203,10 @@ Para reproduzir e validar todos os caminhos condicionais da automação:
 
 | Cenário de Teste | Valor (R$) | Descrição / Motivo para Copiar e Colar | Resultado Esperado no Fluxo |
 | :--- | :---: | :--- | :--- |
-| **1. Aprovação Automática** | `84.50` | `Corrida de aplicativo (Uber) de ida e volta para reunião presencial de alinhamento de projeto na sede do cliente. Nota fiscal emitida.` | Rota 1 (`APROVADO` / `BAIXO`) $\rightarrow$ Status: `Aprovado Automaticamente` |
-| **2. Revisão Humana (HITL por Valor Alto)** | `1250.00` | `Hospedagem de 3 diárias em hotel executivo e passagens terrestres para participação no congresso nacional de tecnologia representando a empresa.` | Rota 2 (`REVISAO_HUMANA` / `ALTO`) $\rightarrow$ Status: `Aguardando Aprovação Humana (HITL)` + Disparo de E-mail ao Gestor |
-| **3. Reprovação Autônoma pela IA** | `210.00` | `Compras` *(ou `Jantar comemorativo de fim de semana com amigos. Não possuo cupom fiscal.`)* | Rota 3 (`REPROVADO` / `ALTO`) $\rightarrow$ Status: `Reprovado Automaticamente` |
-| **4. Exceção / Erro de API** | `115.00` | *(Simulação de falha de API/cota no módulo Gemini)* | Rota de Exceção (`Error Handler`) $\rightarrow$ Status: `Erro na IA - Revisar Manualmente` |
+| **1. Aprovação Automática** | `84.50` | `Corrida de aplicativo (Uber) de ida e volta para reunião presencial de alinhamento de projeto na sede do cliente. Nota fiscal emitida.` | Rota 1 (`APROVADO` / `BAIXO`) -> Status: `Aprovado Automaticamente` |
+| **2. Revisão Humana (HITL por Valor Alto)** | `1250.00` | `Hospedagem de 3 diárias em hotel executivo e passagens terrestres para participação no congresso nacional de tecnologia representando a empresa.` | Rota 2 (`REVISAO_HUMANA` / `ALTO`) -> Status: `Aguardando Aprovação Humana (HITL)` + Disparo de E-mail ao Gestor |
+| **3. Reprovação Autônoma pela IA** | `210.00` | `Compras` *(ou `Jantar comemorativo de fim de semana com amigos. Não possuo cupom fiscal.`)* | Rota 3 (`REPROVADO` / `ALTO`) -> Status: `Reprovado Automaticamente` |
+| **4. Exceção / Erro de API** | `115.00` | *(Simulação de falha de API/cota no módulo Gemini)* | Rota de Exceção (`Error Handler`) -> Status: `Erro na IA - Revisar Manualmente` |
 
 3. No **Make**, clique em **`Run once`** (ou aguarde o ciclo agendado) para observar o processamento em tempo real.
 4. Abra a **Planilha de Controle no Google Sheets** para verificar as colunas `F`, `G`, `H` e `I` preenchidas e simular a decisão final do gestor no menu suspenso (`Aprovado pelo Gestor` ou `Reprovado pelo Gestor`).
