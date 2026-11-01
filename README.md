@@ -156,6 +156,8 @@ Responda APENAS com um objeto JSON válido, em linha única, sem blocos de códi
 
 ## ⚖️ 6. Decisões Automatizadas, Supervisão Humana (HITL) e Escopo Documental
 
+**Limitação da Etapa de Aprovação:** Na versão atual, o processo de Human-in-the-Loop contempla a notificação do gestor e o registro de sua deliberação na planilha de controle. O sistema não realiza diretamente o pagamento do reembolso nem possui integração com sistemas financeiros para executar transferências. A automatização dessas etapas permanece prevista para uma evolução futura da arquitetura.
+
 ### Matriz de Delegação Operacional
 - **Decisões 100% Automatizadas (Delegadas à IA):**
   1. **Aprovação Direta (`APROVADO`):** Solicitações com valor estritamente inferior a R$ 500,00, nexo corporativo claro e risco baixo.
@@ -174,14 +176,14 @@ Na versão atual do protótipo, o formulário no Google Forms **não possui camp
 
 - **Segurança e Credenciais:** Integrações autenticadas via protocolo **OAuth 2.0** e chaves de API encapsuladas no cofre de credenciais do Make, sem exposição em código aberto.
 - **Privacidade e Conformidade com a LGPD (Lei nº 13.709/2018):** Coleta restrita ao mínimo necessário (princípios da finalidade e necessidade). No envio ao LLM (Gemini), trafegam-se apenas a descrição da despesa e o valor, omitindo-se o nome civil e o e-mail do colaborador. Essa prática aplica **minimização de dados e remoção de identificadores diretos** (não configurando anonimização completa, visto que o campo de texto livre ainda pode conter informações identificáveis caso inseridas pelo usuário).
-- **Prevenção contra Alucinação e Prompt Injection:** O prompt instrui o modelo a rejeitar comandos maliciosos inseridos na justificativa e exige retorno estrito em JSON validado pelo módulo `Parse JSON`. Como boa prática de arquitetura para produção, recomenda-se combinar essa análise semântica com travas determinísticas no Make para validação do limite numérico e dos valores permitidos no campo `decisao`.
+- **Prevenção contra Alucinação e Prompt Injection:** O prompt instrui o modelo a rejeitar comandos maliciosos inseridos na justificativa e exige retorno em formato JSON. O módulo `Parse JSON` converte a resposta textual em um objeto estruturado. Entretanto, a conversão para JSON não garante, isoladamente, a validade semântica da decisão. Como boa prática de arquitetura para produção, recomenda-se combinar essa etapa com filtros determinísticos no Make para conferir os campos obrigatórios, os valores permitidos para `decisao` e `risco` e a aplicação correta do limite numérico.
 - **Tratamento de Falhas (`Error Handling`):** A rota de `Error Handler` acoplada ao módulo do Google Gemini captura falhas de comunicação, *timeout* ou limite de cota da API (como erros HTTP 429/503) e grava automaticamente o status `Erro na IA - Revisar Manualmente` na linha correspondente da planilha (Módulo 8). Para um ambiente de produção, recomenda-se expandir rotas de exceção e políticas de *retry* também para os módulos subsequentes (`Parse JSON`, `Google Sheets` e `Gmail`).
 
 ---
 
 ## 📸 8. Evidências e Detalhamento dos 9 Módulos do Workflow
 
-#### Cenário e Fluxo completo no Make
+#### 8.1. Cenário e Fluxo Completo no Make
 <img width="959" height="407" alt="image" src="https://github.com/user-attachments/assets/9567bdb7-ff32-48e3-9dcc-ff8c99ca5c98" />
 
 ---
@@ -278,13 +280,14 @@ Para reproduzir e validar todos os caminhos condicionais da automação:
 
 | Cenário de Teste | Valor (R$) | Descrição / Motivo para Copiar e Colar | Resultado Esperado no Fluxo |
 | :--- | :---: | :--- | :--- |
-| **1. Aprovação Automática** | `84.50` | `Corrida de aplicativo (Uber) de ida e volta para reunião presencial de alinhamento de projeto na sede do cliente. Nota fiscal emitida.` | Rota 1 (`APROVADO` / `BAIXO`) -> Status: `Aprovado Automaticamente` |
+| **1. Aprovação Automática** | `84.50` | `Corrida de aplicativo (Uber) de ida e volta para reunião presencial de alinhamento de projeto na sede do cliente. O colaborador declara que a nota fiscal foi emitida.` | Rota 1 (`APROVADO` / `BAIXO`) -> Status: `Aprovado Automaticamente` |
 | **2. Revisão Humana (HITL por Valor Alto)** | `1250.00` | `Hospedagem de 3 diárias em hotel executivo e passagens terrestres para participação no congresso nacional de tecnologia representando a empresa.` | Rota 2 (`REVISAO_HUMANA` / `ALTO`) -> Status: `Aguardando Aprovação Humana (HITL)` + Disparo de E-mail ao Gestor |
 | **3. Reprovação Autônoma pela IA** | `210.00` | `Compras` *(ou `Jantar comemorativo de fim de semana com amigos. Não possuo cupom fiscal.`)* | Rota 3 (`REPROVADO` / `ALTO`) -> Status: `Reprovado Automaticamente` |
 | **4. Exceção / Erro de API** | `115.00` | *(Simulação de falha de API/cota no módulo Gemini)* | Rota de Exceção (`Error Handler`) -> Status: `Erro na IA - Revisar Manualmente` |
 
 3. No **Make**, clique em **`Run once`** (ou aguarde o ciclo agendado) para observar o processamento em tempo real.
 4. Abra a **Planilha de Controle no Google Sheets** para verificar as colunas `F`, `G`, `H` e `I` preenchidas e simular a decisão final do gestor no menu suspenso (`Aprovado pelo Gestor` ou `Reprovado pelo Gestor`).
+**Observação sobre o Cenário 4:** A validação do Error Handler deve ser realizada por meio de uma simulação controlada de falha na comunicação com a API do Gemini, em ambiente de teste. Após a ocorrência da exceção, deve-se verificar se o módulo de contingência atualiza corretamente a linha correspondente no Google Sheets com o status `Erro na IA - Revisar Manualmente`. Essa simulação deve ser distinguida de uma execução normal do workflow.
 
 ---
 
@@ -297,8 +300,8 @@ Para reproduzir e validar todos os caminhos condicionais da automação:
 ---
 
 ## 🔗 11. Links e Entregáveis Oficiais
-- ⚡ **Cenário de Automação (Make):** `[https://us2.make.com/public/shared-scenario/vLHg7cQiJBp/solicitacao-de-reembolso-corporativo]`
-- 📁 **Repositório Oficial (GitHub):** `[(https://github.com/aysllanlima/ai-operations-reembolso)]`
-- 📊 **Planilha de Controle e Painel HITL (Google Sheets):** `[https://docs.google.com/spreadsheets/d/1JHUFSBRWdXRmzoAitzcquhyY5vBW_sCHGIRRqR5DvKM/edit?usp=sharing]`
-- 📝 **Formulário de Entrada (Google Forms):** `[https://docs.google.com/forms/d/e/1FAIpQLSeHUYYIhwMoO3QEC6C1rGql4m9BrT9dtp-4ji1OgMToP1Dk3Q/viewform]`
-- 🎥 **Vídeo Pitch Demonstrativo (YouTube):** `[]`
+- ⚡ **Cenário de Automação (Make):** https://us2.make.com/public/shared-scenario/vLHg7cQiJBp/solicitacao-de-reembolso-corporativo
+- 📁 **Repositório Oficial (GitHub):** https://github.com/aysllanlima/ai-operations-reembolso
+- 📊 **Planilha de Controle e Painel HITL (Google Sheets):** https://docs.google.com/spreadsheets/d/1JHUFSBRWdXRmzoAitzcquhyY5vBW_sCHGIRRqR5DvKM/edit?usp=sharing
+- 📝 **Formulário de Entrada (Google Forms):** https://docs.google.com/forms/d/e/1FAIpQLSeHUYYIhwMoO3QEC6C1rGql4m9BrT9dtp-4ji1OgMToP1Dk3Q/viewform
+- 🎥 **Vídeo Pitch Demonstrativo (YouTube):** https://youtu.be/7cwjijYt27o
