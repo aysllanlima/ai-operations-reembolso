@@ -181,75 +181,91 @@ Na versão atual do protótipo, o formulário no Google Forms **não possui camp
 
 ## 📸 8. Evidências e Detalhamento dos 9 Módulos do Workflow
 
+#### Cenário e Fluxo completo no Make
+<img width="959" height="407" alt="image" src="https://github.com/user-attachments/assets/9567bdb7-ff32-48e3-9dcc-ff8c99ca5c98" />
+
+---
+
 #### 1. Google Sheets — Watch New Rows (Módulo 1)
 > Monitora a planilha vinculada ao Google Forms e dispara o fluxo ao detectar uma nova linha, capturando nome, e-mail, descrição, valor e número da linha.
 
-![Módulo 1]<img width="352" height="397" alt="image" src="https://github.com/user-attachments/assets/59198c5c-14fb-413e-afe1-ccdd379ddb07" />
+<img width="352" height="397" alt="image" src="https://github.com/user-attachments/assets/59198c5c-14fb-413e-afe1-ccdd379ddb07" />
 
 ---
 
 #### 2. Google Gemini AI — Generate a Response (Módulo 2)
 > Analisa a semântica da justificativa e o valor frente ao teto de R$ 500,00 para avaliar a conformidade, classificar o risco e definir a decisão.
 
-![Módulo 2]<img width="356" height="404" alt="image" src="https://github.com/user-attachments/assets/7812ca7e-79ce-47a6-8cfe-f1f677c08a27" />
+<img width="356" height="404" alt="image" src="https://github.com/user-attachments/assets/7812ca7e-79ce-47a6-8cfe-f1f677c08a27" />
 
 ---
 
 #### 3. JSON — Parse JSON (Módulo 3)
 > Converte o retorno textual do modelo de IA em um objeto estruturado contendo as variáveis `decisao`, `risco` e `justificativa`.
 
-![Módulo 3]<img width="352" height="223" alt="image" src="https://github.com/user-attachments/assets/c0dc0d16-bf2b-4f47-a52d-0124c4a64ea3" />
+<img width="352" height="223" alt="image" src="https://github.com/user-attachments/assets/c0dc0d16-bf2b-4f47-a52d-0124c4a64ea3" />
 
 ---
 
 #### 4. Flow Control — Router (Módulo 4)
 > Avalia a variável `decisao` extraída do JSON e ramifica o fluxo em três caminhos condicionais mutuamente exclusivos.
 
-![Módulo 4](link-da-imagem-do-modulo-4.png)
+<img width="234" height="329" alt="image" src="https://github.com/user-attachments/assets/cb842402-1d53-44e7-9579-08daa333d612" />
+
 
 ---
 
 #### 5. Google Sheets — Update a Row / Rota 1 Aprovado (Módulo 5)
 > Grava o parecer da IA na planilha e atualiza a coluna `Status_Final` para `Aprovado Automaticamente` em despesas legítimas abaixo de R$ 500,00.
 
-![Módulo 5](link-da-imagem-do-modulo-5.png)
+<img width="266" height="395" alt="image" src="https://github.com/user-attachments/assets/2e9c32df-5d8d-4731-8768-de31e093812d" />
+
 
 ---
 
 #### 6. Google Sheets — Update a Row / Rota 2 Revisão Humana (Módulo 6)
 > Atualiza o registro na planilha com o status `Aguardando Aprovação Humana (HITL)` para pedidos de valor elevado ou exceções operacionais.
 
-![Módulo 6](link-da-imagem-do-modulo-6.png)
+<img width="263" height="402" alt="image" src="https://github.com/user-attachments/assets/b02e97b3-78da-45e9-aced-5716c4d3ee1a" />
+
 
 ---
 
 #### 7. Gmail — Send an Email / Rota 2 Revisão Humana (Módulo 7)
 > Dispara um e-mail executivo em HTML ao gestor responsável contendo os dados do pedido, a análise da IA e o botão de acesso à planilha.
 
-![Módulo 7](link-da-imagem-do-modulo-7.png)
+<img width="364" height="403" alt="image" src="https://github.com/user-attachments/assets/7fbab2c7-523e-4e67-abc8-d5bc075c00ce" />
+
 
 ---
 
 #### 8. Google Sheets — Update a Row / Error Handler (Módulo 8)
 > Rota de contingência acoplada ao módulo do Gemini que captura falhas ou limites de cota da API e registra `Erro na IA - Revisar Manualmente`.
 
-![Módulo 8](link-da-imagem-do-modulo-8.png)
+<img width="357" height="401" alt="image" src="https://github.com/user-attachments/assets/a89405f4-8695-48c5-89e8-d8952f540b9f" />
+
 
 ---
 
 #### 9. Google Sheets — Update a Row / Rota 3 Reprovado (Módulo 9)
 > Registra a justificativa de auditoria na planilha e define o status como `Reprovado Automaticamente` para gastos pessoais, implausíveis ou vagos.
 
-![Módulo 9](link-da-imagem-do-modulo-9.png)
+<img width="269" height="407" alt="image" src="https://github.com/user-attachments/assets/d5d2838a-36d4-497c-930f-ae4ac95fa534" />
+
 
 ---
 
 
 ### 8.2. Repositório Tabular no Google Sheets com Testes Executados e Menus Suspensos
-![Planilha Google Sheets](./prints/02-planilha-resultados.png)
+<img width="856" height="215" alt="image" src="https://github.com/user-attachments/assets/2f457273-5af4-46bb-befe-3445146720b1" />
+---
+<img width="188" height="220" alt="image" src="https://github.com/user-attachments/assets/6a61ea7e-e7dc-4418-9b9a-e8397982e376" />
+
+---
 
 ### 8.3. Notificação Executiva em HTML Enviada ao Gestor (Human-in-the-Loop)
-![E-mail HITL](./prints/03-email-hitl.png)
+<img width="241" height="265" alt="image" src="https://github.com/user-attachments/assets/0aa75e1c-3876-4338-9646-8b600d4193ef" />
+
 
 ---
 
@@ -281,8 +297,8 @@ Para reproduzir e validar todos os caminhos condicionais da automação:
 ---
 
 ## 🔗 11. Links e Entregáveis Oficiais
-
-- 📁 **Repositório Oficial (GitHub):** `[INSERIR_LINK_DO_SEU_GITHUB_AQUI]`
-- 📊 **Planilha de Controle e Painel HITL (Google Sheets):** [Acessar Planilha de Controle](https://docs.google.com/spreadsheets/d/1JHUFSBRWdXRmzoAitzcquhyY5vBW_sCHGIRRqR5DvKM/edit?usp=sharing)
-- 📝 **Formulário de Entrada (Google Forms):** `[INSERIR_LINK_DO_SEU_GOOGLE_FORMS_AQUI]`
-- 🎥 **Vídeo Pitch Demonstrativo (YouTube):** `[INSERIR_LINK_DO_SEU_VIDEO_NO_YOUTUBE_AQUI]`
+- ⚡ **Cenário de Automação (Make):** `[https://us2.make.com/public/shared-scenario/vLHg7cQiJBp/solicitacao-de-reembolso-corporativo]`
+- 📁 **Repositório Oficial (GitHub):** `[(https://github.com/aysllanlima/ai-operations-reembolso)]`
+- 📊 **Planilha de Controle e Painel HITL (Google Sheets):** `[https://docs.google.com/spreadsheets/d/1JHUFSBRWdXRmzoAitzcquhyY5vBW_sCHGIRRqR5DvKM/edit?usp=sharing]`
+- 📝 **Formulário de Entrada (Google Forms):** `[https://docs.google.com/forms/d/e/1FAIpQLSeHUYYIhwMoO3QEC6C1rGql4m9BrT9dtp-4ji1OgMToP1Dk3Q/viewform]`
+- 🎥 **Vídeo Pitch Demonstrativo (YouTube):** `[]`
